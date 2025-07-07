@@ -1,26 +1,25 @@
-# Etapa 1: Build
+# Etapa 1: Build com Turbo
 FROM node:20 AS builder
 
+# Sobe tudo para o /app (monorepo completo)
 WORKDIR /app
-
-# Copia os arquivos do app (ajuste o path se estiver em um monorepo)
 COPY . .
 
 # Instala dependências
-RUN yarn
+RUN yarn install --frozen-lockfile
 
-# Builda com Vite
-RUN yarn build
+# Builda apenas o app web usando Turbo
+RUN yarn dlx turbo run build --filter=web...
 
-# Etapa 2: Runner
+# Etapa 2: Serve a build
 FROM node:20-slim AS runner
 
 WORKDIR /app
 
-# Copia só a build gerada
-COPY --from=builder /app/dist ./dist
+# Copia a build do app
+COPY --from=builder /app/apps/web/dist ./dist
 
-# Instala o 'serve'
+# Instala servidor estático
 RUN yarn global add serve
 
 EXPOSE 3000
