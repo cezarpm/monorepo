@@ -3,31 +3,32 @@ FROM node:20 AS builder
 
 WORKDIR /app
 
-# Copia só o que é necessário para instalar dependências e buildar
+# Copia os arquivos de configuração essenciais (package.json, yarn.lock, turbo.json)
 COPY package.json yarn.lock turbo.json ./
+
+# Copia as pastas do monorepo necessárias
 COPY apps ./apps
 COPY packages ./packages
 
-# Instala dependências sem dev (opcional)
+# Instala dependências com yarn
 RUN yarn install --frozen-lockfile
 
-# Build do app específico (ajuste o nome conforme o seu app)
+# Build do app web dentro do monorepo
 RUN npx turbo run build --filter=web...
 
-# Etapa 2: Imagem leve para servir os estáticos
+# Etapa 2: Imagem leve para servir arquivos estáticos
 FROM node:20-slim AS runner
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Instala um servidor estático (como 'serve')
+# Instala o servidor estático 'serve'
 RUN yarn global add serve
 
-# Copia apenas os arquivos do build do Vite
+# Copia só o build do app web para a imagem final
 COPY --from=builder /app/apps/web/dist ./dist
 
 EXPOSE 3000
 
-# Serve o app Vite na porta 3000
 CMD ["serve", "-s", "dist", "-l", "3000"]
