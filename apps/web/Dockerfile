@@ -27,4 +27,4 @@ RUN echo "Conteúdo de /app/node_modules" && ls -la /app/node_modules
 
 EXPOSE 3000
 
-CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
+CMD ["npx", "serve", "-s", "dist", "--listen", "0.0.0.0:3000"]
