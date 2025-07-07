@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 
 const books = [
   { id: 1, title: "O Hobbit", author: "J.R.R. Tolkien" },
