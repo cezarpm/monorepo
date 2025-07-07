@@ -14,10 +14,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copia build, node_modules e package.json só do pacote web
-COPY --from=builder /app/packages/web/dist ./dist
-COPY --from=builder /app/packages/web/node_modules ./node_modules
-COPY --from=builder /app/packages/web/package.json ./
+COPY --from=builder /app/apps/web/node_modules ./node_modules
+COPY --from=builder /app/apps/web/package.json ./
+COPY --from=builder /app/apps/web/dist ./dist
 
 EXPOSE 3000
 
