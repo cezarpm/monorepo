@@ -7,7 +7,7 @@ WORKDIR /app
 COPY . .
 
 # Instala dependências
-RUN yarn install --frozen-lockfile
+RUN yarn
 
 # Builda com Vite
 RUN yarn build
