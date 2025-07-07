@@ -10,6 +10,6 @@ WORKDIR /app/apps/api
 
 RUN yarn install --frozen-lockfile
 
-EXPOSE 4000
+EXPOSE 5000
 
 CMD ["yarn", "start"]
