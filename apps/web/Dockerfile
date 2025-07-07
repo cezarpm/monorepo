@@ -3,14 +3,8 @@ FROM node:20 AS builder
 
 WORKDIR /app
 
-# Copia os arquivos de dependência
-COPY package.json yarn.lock ./
-
 # Instala dependências
 RUN yarn install --frozen-lockfile
-
-# Copia o restante do código
-COPY . .
 
 # Executa o build do Vite
 RUN yarn build
