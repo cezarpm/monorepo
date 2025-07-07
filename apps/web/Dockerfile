@@ -9,7 +9,7 @@ COPY . .
 RUN yarn install --frozen-lockfile
 
 # Builda apenas o app web usando Turbo
-RUN yarn dlx turbo run build --filter=web...
+RUN yarn npx turbo run build --filter=web...
 
 # Etapa 2: Serve a build
 FROM node:20-slim AS runner
