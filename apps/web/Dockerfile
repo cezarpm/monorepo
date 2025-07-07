@@ -2,20 +2,22 @@ FROM node:20 AS builder
 
 WORKDIR /app
 
-COPY package.json yarn.lock turbo.json ./
-COPY apps ./apps
-COPY packages ./packages
+# Copia só o package.json e yarn.lock do app web
+COPY package.json yarn.lock ./
 
 RUN yarn install --frozen-lockfile
 
-WORKDIR /app/apps/web
+# Copia tudo dentro de apps/web (contexto)
+COPY . .
+
 RUN yarn build
 
+# --- Stage final ---
 FROM node:20-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/apps/web/dist ./dist
+COPY --from=builder /app/dist ./dist
 
 RUN yarn global add serve
 
