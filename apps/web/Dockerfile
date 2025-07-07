@@ -3,17 +3,29 @@ FROM node:20 AS builder
 
 WORKDIR /app
 
-# Copy root package.json and lockfile
-COPY package.json ./
-COPY package-lock.json ./
- 
-# Copy the api package.json
-COPY apps/web/package.json ./apps/web/package.json
+# Copia só o que é necessário para instalar dependências e buildar
+COPY package.json yarn.lock turbo.json ./
+COPY apps ./apps
+COPY packages ./packages
 
 # Instala dependências sem dev (opcional)
-RUN yarn
+RUN yarn install --frozen-lockfile
 
-COPY . .
+# Build do app específico (ajuste o nome conforme o seu app)
+RUN npx turbo run build --filter=web...
+
+# Etapa 2: Imagem leve para servir os estáticos
+FROM node:20-slim AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Instala um servidor estático (como 'serve')
+RUN yarn global add serve
+
+# Copia apenas os arquivos do build do Vite
+COPY --from=builder /app/apps/web/dist ./dist
 
 EXPOSE 3000
 
