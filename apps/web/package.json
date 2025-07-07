@@ -7,12 +7,14 @@
     "dev": "vite --clearScreen false",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint \"src/**/*.ts\""
+    "lint": "eslint \"src/**/*.ts\"",
+    "start": "serve -s dist -p 3000"
   },
   "dependencies": {
     "@repo/ui": "*",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
