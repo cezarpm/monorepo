@@ -25,6 +25,6 @@ RUN echo "Conteúdo de /app/dist" && ls -la /app/dist
 RUN echo "Conteúdo de /app/node_modules" && ls -la /app/node_modules
 
 
-EXPOSE 3000
+EXPOSE 5555
 
-CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
+CMD ["npx", "serve", "-s", "dist", "-l", "5555"]
