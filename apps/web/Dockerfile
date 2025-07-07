@@ -6,13 +6,8 @@ WORKDIR /app
 # Copia tudo
 COPY . .
 
-# Instala dependências na raiz (usando pnpm ou yarn se preferir)
-RUN corepack enable && \
-    npm install -g turbo && \
-    npm install
-
 # Faz build apenas do app frontend
-RUN turbo run build --filter=web...
+RUN npx turbo run build --filter=web...
 
 # Etapa 2: Serve o frontend com uma imagem leve
 FROM node:20-slim AS runner
@@ -27,7 +22,7 @@ COPY --from=builder /app/apps/web/public ./public
 COPY --from=builder /app/apps/web/package.json ./package.json
 COPY --from=builder /app/apps/web/next.config.js ./next.config.js
 
-RUN npm install --omit=dev
+RUN yarn install --omit=dev
 
 EXPOSE 3000
 
