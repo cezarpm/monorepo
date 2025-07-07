@@ -18,6 +18,13 @@ COPY --from=builder /app/apps/web/node_modules ./node_modules
 COPY --from=builder /app/apps/web/package.json ./
 COPY --from=builder /app/apps/web/dist ./dist
 
+
+# Depois do COPY
+RUN echo "Conteúdo de /app" && ls -la /app
+RUN echo "Conteúdo de /app/dist" && ls -la /app/dist
+RUN echo "Conteúdo de /app/node_modules" && ls -la /app/node_modules
+
+
 EXPOSE 3000
 
 CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
