@@ -1,25 +1,24 @@
-# Etapa 1: Build com Turbo
+# Etapa 1: Build monorepo + build web
 FROM node:20 AS builder
 
 WORKDIR /app
+
 COPY . .
 
 RUN yarn install --frozen-lockfile
 
-RUN npx turbo run build --filter=web...
+RUN npx turbo run build --filter=web
 
-# Etapa 2: Serve a build
-FROM node:20-slim AS runner
-
-WORKDIR /app
-
+# Etapa 2: Imagem final para rodar o app web
 FROM node:18-alpine
 
 WORKDIR /app
 
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/dist ./dist
+# Copia build, node_modules e package.json só do pacote web
+COPY --from=builder /app/packages/web/dist ./dist
+COPY --from=builder /app/packages/web/node_modules ./node_modules
+COPY --from=builder /app/packages/web/package.json ./
 
 EXPOSE 3000
+
 CMD ["yarn", "start"]
