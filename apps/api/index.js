@@ -1,6 +1,9 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const PORT = 5000;
+
+app.use(cors()); // <-- Permite CORS para todas as origens por padrão
 
 const books = [
   { id: 1, title: "O Hobbit", author: "J.R.R. Tolkien" },
@@ -12,7 +15,6 @@ app.get("/", (req, res) => {
   res.send("Hello from Express 🚀");
 });
 
-// Rota GET /books
 app.get("/books", (_req, res) => {
   res.json(books);
 });
