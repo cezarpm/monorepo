@@ -13,7 +13,7 @@ COPY apps/web/package.json ./apps/web/package.json
 # Instala dependências sem dev (opcional)
 RUN yarn
 
-COPY --from=builder /app/apps/web/dist ./dist
+COPY . .
 
 EXPOSE 3000
 
