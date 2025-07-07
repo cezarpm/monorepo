@@ -9,22 +9,16 @@ RUN yarn install --frozen-lockfile
 
 RUN npx turbo run build --filter=web
 
-# Etapa 2: Imagem final para rodar o app web
-FROM node:18-alpine
+# Etapa 2: Imagem final para rodar o app web (Node 20 Bullseye - ambiente completo)
+FROM node:20-bullseye
 
 WORKDIR /app
 
+# Copiar dependências e build da etapa anterior
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/web/package.json ./
 COPY --from=builder /app/apps/web/dist ./dist
 
+EXPOSE 3000
 
-# Depois do COPY
-RUN echo "Conteúdo de /app" && ls -la /app
-RUN echo "Conteúdo de /app/dist" && ls -la /app/dist
-RUN echo "Conteúdo de /app/node_modules" && ls -la /app/node_modules
-
-
-EXPOSE 5555
-
-CMD ["npx", "serve", "-s", "dist", "-l", "5555"]
+CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
