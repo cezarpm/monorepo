@@ -20,4 +20,4 @@ COPY --from=builder /app/apps/web/dist ./dist
 
 EXPOSE 3000
 
-CMD ["npx", "serve", "-s", "dist", "-l", "0.0.0.0:3000"]
+CMD ["npx", "serve", "-s", "dist", "-l", "3000"]
