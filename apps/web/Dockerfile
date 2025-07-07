@@ -1,7 +1,7 @@
 # Etapa 1: Instala dependências e builda com Turbo
 FROM node:20 AS builder
 
-WORKDIR /app
+WORKDIR /app/web
 
 # Copia tudo
 COPY . .
