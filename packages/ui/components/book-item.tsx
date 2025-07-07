@@ -12,7 +12,7 @@ export const BookItem = ({ book }: { book: Book }) => {
         borderRadius: "8px",
         padding: "12px",
         marginBottom: "8px",
-        backgroundColor: "#f9f9f9",
+        backgroundColor: "green",
         boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
       }}
     >
