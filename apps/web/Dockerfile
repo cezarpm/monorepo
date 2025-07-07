@@ -12,6 +12,8 @@ RUN npx turbo run build --filter=web
 # Etapa 2: Imagem final para rodar o app web (Node 20 Bullseye - ambiente completo)
 FROM node:20-bullseye
 
+RUN apt-get update && apt-get install -y xsel && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copiar dependências e build da etapa anterior
