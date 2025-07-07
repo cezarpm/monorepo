@@ -7,7 +7,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ["react", "react-dom", "lodash"], // Exemplo de como agrupar dependências comuns
+          vendor: ["react", "react-dom"],
         },
       },
     },
