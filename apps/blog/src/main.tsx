@@ -1,14 +1,46 @@
+import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style.css";
 import { Header, Counter } from "@repo/ui";
 
-const App = () => (
-  <div>
-    <Header title="Blog" />
-    <div className="card">
-      <Counter />
+const App = () => {
+  const [books, setBooks] = useState([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("http://10.40.10.31:5000/")
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro na resposta da API");
+        return res.json();
+      })
+      .then((data) => setBooks(data))
+      .catch((err) => {
+        console.error("Erro ao buscar livros:", err);
+        setError("Não foi possível carregar os livros.");
+      });
+  }, []);
+
+  return (
+    <div>
+      <Header title="Blog" />
+      <div className="card">
+        <Counter />
+      </div>
+
+      <div className="card">
+        <h2>Livros</h2>
+        {error ? (
+          <p style={{ color: "red" }}>{error}</p>
+        ) : (
+          <ul>
+            {books.map((book: any, index) => (
+              <li key={index}>{JSON.stringify(book)}</li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 createRoot(document.getElementById("app")!).render(<App />);
