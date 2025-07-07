@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./style.css";
-import { Header, Counter } from "@repo/ui";
+import { Header, Counter, BookItem } from "@repo/ui";
 
 const App = () => {
   const [books, setBooks] = useState([]);
@@ -34,7 +34,7 @@ const App = () => {
         ) : (
           <ul>
             {books.map((book: any, index) => (
-              <li key={index}>{JSON.stringify(book)}</li>
+              <BookItem key={index} book={book} />
             ))}
           </ul>
         )}
