@@ -20,9 +20,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Gerar turbo-graph.json
         run: |
           npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
