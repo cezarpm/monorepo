@@ -1,0 +1,33 @@
+name: Turbo Affected Graph on PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  turbo-graph:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: |
+          corepack enable
+          yarn install --frozen-lockfile
+
+      - name: Generate Turbo Graph and Detect Changes
+        id: changes
+        run: |
+          echo "## 🔍 Turbo Build Graph" >> pr-summary.txt
+          npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
+          cat turbo-graph.json | jq -r '.tasks[].package' | sort | uniq >> pr-summary.txt
+
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: pr-summary.txt

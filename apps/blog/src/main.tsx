@@ -8,7 +8,7 @@ const App = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("http://10.40.10.31:5000/books")
+    fetch("http://localhost:5000/books")
       .then((res) => {
         if (!res.ok) throw new Error("Erro na resposta da API");
         return res.json();
