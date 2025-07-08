@@ -31,11 +31,14 @@ jobs:
         id: graph
         run: |
           echo "## 🔍 Apps afetados por este PR:" > pr-summary.txt
+
+          # Descobre os apps que dependem de algo que mudou (ex: @repo/ui)
           npx turbo run build \
-            --filter=...[origin/main] \
-            --filter=apps/... \
+            --filter=...[$(git merge-base origin/main HEAD)] \
+            --filter=@repo/* \
             --dry=json > turbo-graph.json
 
+          # Extrai nomes dos pacotes com build agendado (apps afetados)
           cat turbo-graph.json \
             | jq -r '.tasks | to_entries[] | select(.value.status == "scheduled") | .value.package' \
             | sort | uniq >> pr-summary.txt
