@@ -31,12 +31,8 @@ jobs:
         id: graph
         run: |
           echo "## 🔍 Apps/Pacotes afetados por este PR:" > pr-summary.txt
-
-          # Gera grafo turbo com diff desde origin/main
           npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
-
-          # Extrai pacotes únicos afetados
-          jq -r '.tasks[].package' turbo-graph.json | sort | uniq >> pr-summary.txt
+          cat turbo-graph.json | jq -r '.tasks | to_entries[] | select(.value.status == "scheduled") | .value.package' | sort | uniq >> pr-summary.txt
 
       - name: Comment on Pull Request
         uses: marocchino/sticky-pull-request-comment@v2
