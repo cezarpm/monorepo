@@ -1,4 +1,4 @@
-name: Turbo Affected Graph on PR
+name: Turbo Affected Apps PR Comment
 
 on:
   pull_request:
@@ -8,26 +8,37 @@ jobs:
   turbo-graph:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node
-        uses: actions/setup-node@v3
+      - name: Checkout repositório com histórico completo
+        uses: actions/checkout@v4
         with:
-          node-version: "20"
+          fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          corepack enable
-          yarn install --frozen-lockfile
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: Generate Turbo Graph and Detect Changes
-        id: changes
+      - name: Instalar dependências
+        run: yarn
+
+      - name: Buscar a branch main
+        run: git fetch origin main:refs/remotes/origin/main
+
+      - name: Gerar turbo-graph.json com filtro
         run: |
-          echo "## 🔍 Turbo Build Graph" >> pr-summary.txt
           npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
-          cat turbo-graph.json | jq -r '.tasks[].package' | sort | uniq >> pr-summary.txt
 
-      - name: Comment on PR
+      - name: Criar comentário de apps afetados
+        run: |
+          echo "## 🧱 Apps afetados por este PR:" > pr-summary.txt
+          jq -r '.packages[] | select(test("^[^@/]"))' turbo-graph.json >> pr-summary.txt
+
+      - name: Comentar no PR (Sticky)
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           path: pr-summary.txt
