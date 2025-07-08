@@ -24,7 +24,7 @@ jobs:
           node-version: 20
 
       - name: Instalar dependências
-        run: npm ci
+        run: yarn
 
       - name: Buscar a branch main
         run: git fetch origin main:refs/remotes/origin/main
