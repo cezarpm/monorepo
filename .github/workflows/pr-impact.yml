@@ -32,18 +32,62 @@ jobs:
 
       - name: Generate Turbo Graph JSON
         run: |
-          npx turbo run build --filter=...[main] --dry=json > turbo-graph.json
+          npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
 
-      - name: Extract affected packages and apps
-        id: extract
+      name: 🚀 Detect Affected Apps and Packages
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  detect-affected:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Fetch main branch
+        run: git fetch origin main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
         run: |
-          echo "## 🚀 Pacotes e apps afetados por este PR:" > pr-summary.md
-          jq -r '.tasks[] | select(.status == "scheduled") | .package' turbo-graph.json | sort -u >> pr-summary.md
+          corepack enable
+          yarn install --frozen-lockfile
 
-          # Adiciona linha em branco para melhor formatação
+      - name: Generate Turbo Graph JSON
+        run: |
+          npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
+
+      - name: Prepare PR comment
+        run: |
+          echo "## 🚀 Conteúdo bruto do turbo-graph.json:" > pr-summary.md
+          echo '```json' >> pr-summary.md
+          cat turbo-graph.json >> pr-summary.md
+          echo '```' >> pr-summary.md
           echo "" >> pr-summary.md
 
+          echo "## 🚀 Pacotes e apps afetados por este PR:" >> pr-summary.md
+          jq -r '.tasks[] | select(.status == "scheduled") | .package' turbo-graph.json | sort -u | sed 's/^/- /' >> pr-summary.md
+
           cat pr-summary.md
+
+      - name: Comment on Pull Request
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: pr-summary.md
+
 
       - name: Comment on Pull Request
         uses: marocchino/sticky-pull-request-comment@v2
