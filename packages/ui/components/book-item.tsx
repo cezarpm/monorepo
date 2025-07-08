@@ -18,7 +18,7 @@ export const BookItem = ({ book }: { book: Book }) => {
     >
       <h3 style={{ margin: "0 0 4px", color: "green" }}>{book.title}</h3>
       <p style={{ margin: 0, color: "black" }}>
-        <strong>Autor:</strong> {book.author}
+        <strong>Autor:</strong> {book.author}aaa
       </p>
       <p style={{ margin: 0, fontSize: "0.85rem", color: "black" }}>
         <strong>ID:</strong> {book.id}
