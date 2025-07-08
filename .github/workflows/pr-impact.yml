@@ -22,7 +22,7 @@ jobs:
 
       - name: Gerar turbo-graph.json
         run: |
-          npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
+          npx turbo run build --filter=...[main] --dry=json > turbo-graph.json
 
       - name: Criar comentário de apps afetados
         run: |
