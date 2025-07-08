@@ -32,7 +32,7 @@ jobs:
 
       - name: Generate Turbo Graph JSON
         run: |
-          npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
+          npx turbo run build --filter=...[main] --dry=json > turbo-graph.json
 
       - name: Extract affected packages and apps
         id: extract
