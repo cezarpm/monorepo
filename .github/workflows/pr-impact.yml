@@ -34,9 +34,17 @@ jobs:
 
       - name: Prepare PR comment with full turbo-graph and affected packages
         run: |
-          echo "## 🚀 Pacotes/apps afetados por este PR:" >> pr-summary.md
-          jq -r '.tasks[] | select(.cache.status == "MISS" or .cache.status == "MISS_REMOTE") | .package' turbo-graph.json | sort -u
+          echo "## 🚀 turbo-graph.json completo:" > pr-summary.md
+          echo '```json' >> pr-summary.md
+          cat turbo-graph.json >> pr-summary.md
+          echo '```' >> pr-summary.md
+          echo "" >> pr-summary.md
 
+          echo "## 🚀 Pacotes/apps afetados por este PR:" >> pr-summary.md
+          jq -r '.tasks[]
+          | select(.cache.status | test("MISS"))
+          | select(.package | test("^[^@]"))
+          | .package' turbo-graph.json | sort -u
 
           cat pr-summary.md
 
