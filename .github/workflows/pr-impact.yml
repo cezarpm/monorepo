@@ -1,4 +1,4 @@
-name: Turbo Affected Graph on PR
+name: Detect Affected Apps (Turborepo)
 
 on:
   pull_request:
@@ -9,8 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Node
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # necessário para acessar histórico e outras branches
+
+      - name: Fetch main branch
+        run: git fetch origin main
+
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "20"
@@ -20,14 +27,18 @@ jobs:
           corepack enable
           yarn install --frozen-lockfile
 
-      - name: Generate Turbo Graph and Detect Changes
-        id: changes
+      - name: Generate Turbo Graph and Detect Affected
+        id: graph
         run: |
-          echo "## 🔍 Turbo Build Graph" >> pr-summary.txt
-          npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
-          cat turbo-graph.json | jq -r '.tasks[].package' | sort | uniq >> pr-summary.txt
+          echo "## 🔍 Apps/Pacotes afetados por este PR:" > pr-summary.txt
 
-      - name: Comment on PR
+          # Gera grafo turbo com diff desde origin/main
+          npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
+
+          # Extrai pacotes únicos afetados
+          jq -r '.tasks[].package' turbo-graph.json | sort | uniq >> pr-summary.txt
+
+      - name: Comment on Pull Request
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           path: pr-summary.txt
