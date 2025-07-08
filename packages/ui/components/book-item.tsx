@@ -23,6 +23,9 @@ export const BookItem = ({ book }: { book: Book }) => {
       <p style={{ margin: 0, fontSize: "0.85rem", color: "black" }}>
         <strong>ID:</strong> {book.id}
       </p>
+      <p style={{ margin: 0, fontSize: "0.85rem", color: "black" }}>
+        <strong>Authior:</strong> {book.author}
+      </p>
     </div>
   );
 };
