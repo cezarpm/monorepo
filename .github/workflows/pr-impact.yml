@@ -27,21 +27,31 @@ jobs:
           corepack enable
           yarn install --frozen-lockfile
 
-      - name: Generate Turbo Graph and Detect Affected
-        id: graph
+      - name: Generate Turbo Graph
+        id: turbo
         run: |
-          echo "## 🔍 Apps afetados por este PR:" > pr-summary.txt
+          echo "## 📦 Apps afetados por este PR:" > pr-summary.txt
 
-          # Descobre os apps que dependem de algo que mudou (ex: @repo/ui)
-          npx turbo run build \
-            --filter=...[$(git merge-base origin/main HEAD)] \
-            --filter=@repo/* \
-            --dry=json > turbo-graph.json
+          CHANGED_PACKAGES=$(git diff --name-only origin/main...HEAD | grep 'package.json' | xargs -I{} dirname {})
+          echo "Pacotes alterados: $CHANGED_PACKAGES"
 
-          # Extrai nomes dos pacotes com build agendado (apps afetados)
-          cat turbo-graph.json \
-            | jq -r '.tasks | to_entries[] | select(.value.status == "scheduled") | .value.package' \
-            | sort | uniq >> pr-summary.txt
+          AFFECTED_APPS=()
+
+          for pkg in $CHANGED_PACKAGES; do
+            echo "Analisando dependentes de $pkg..."
+            APPS=$(npx turbo run build --filter=...[$pkg] --filter=@repo/* --dry=json \
+                  | jq -r '.tasks | to_entries[] | select(.value.status == "scheduled") | .value.package')
+            AFFECTED_APPS+=($APPS)
+          done
+
+          # Remover duplicados
+          UNIQ_APPS=$(printf "%s\n" "${AFFECTED_APPS[@]}" | sort -u)
+
+          echo "Apps afetados:" $UNIQ_APPS
+
+          for app in $UNIQ_APPS; do
+            echo "- $app" >> pr-summary.txt
+          done
 
       - name: Comment on Pull Request
         uses: marocchino/sticky-pull-request-comment@v2
