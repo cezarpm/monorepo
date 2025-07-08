@@ -1,54 +1,38 @@
-name: 🚀 Detect Affected Apps and Packages
+name: Turbo Affected Apps PR Comment
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-permissions:
-  pull-requests: write
-
 jobs:
-  detect-affected:
+  turbo-graph:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
-      - name: Fetch main branch
-        run: git fetch origin main
-
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
       - name: Install dependencies
-        run: |
-          corepack enable
-          yarn install --frozen-lockfile
+        run: npm ci
 
-      - name: Generate Turbo Graph JSON
+      - name: Gerar turbo-graph.json
         run: |
           npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
 
-      - name: Prepare PR comment with full turbo-graph and affected packages
+      - name: Criar comentário de apps afetados
         run: |
-          echo "## 🚀 turbo-graph.json completo:" > pr-summary.md
-          echo '```json' >> pr-summary.md
-          cat turbo-graph.json >> pr-summary.md
-          echo '```' >> pr-summary.md
-          echo "" >> pr-summary.md
+          echo "## 🧱 Apps afetados por este PR:" > pr-summary.txt
+          jq -r '.packages[] | select(test("^[^@/]"))' turbo-graph.json >> pr-summary.txt
 
-          echo "## 🚀 Pacotes/apps afetados por este PR:" >> pr-summary.md
-          jq -r '.tasks[]
-          | select(.cache.status | test("MISS"))
-          | select(.package | test("^[^@]"))
-          | .package' turbo-graph.json | sort -u
-
-          cat pr-summary.md
-
-      - name: Comment on PR
+      - name: Comentar no PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          path: pr-summary.md
+          path: pr-summary.txt
