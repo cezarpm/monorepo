@@ -39,7 +39,7 @@ const App = () => {
       </div>
 
       <div>
-        <h2>Livros</h2>
+        <h2>Livros 2</h2>
         {error ? (
           <p style={{ color: "red" }}>{error}</p>
         ) : (
