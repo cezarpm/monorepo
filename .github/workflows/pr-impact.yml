@@ -13,23 +13,32 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repositório com histórico completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Gerar turbo-graph.json
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Buscar a branch main
+        run: git fetch origin main:refs/remotes/origin/main
+
+      - name: Gerar turbo-graph.json com filtro
         run: |
-          npx turbo run build --filter=...[main] --dry=json > turbo-graph.json
+          npx turbo run build --filter=...[origin/main] --dry=json > turbo-graph.json
 
       - name: Criar comentário de apps afetados
         run: |
           echo "## 🧱 Apps afetados por este PR:" > pr-summary.txt
           jq -r '.packages[] | select(test("^[^@/]"))' turbo-graph.json >> pr-summary.txt
 
-      - name: Comentar no PR
+      - name: Comentar no PR (Sticky)
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           path: pr-summary.txt
